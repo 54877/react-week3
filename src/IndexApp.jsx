@@ -1,6 +1,3 @@
-// 登入需要loading，目前帳密錯誤仍會登入
-// 將tbody products 寫成元件
-// 嘗試使用context 傳遞參數
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -250,8 +247,8 @@ function CreatTable({creatModal,URL, PATH ,setTempProduct}){
     postProductsData()
   }
  
-  const [loading, setLoading] = useState(false),
-        modalRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const modalRef = useRef(null);
 
   const {register , handleSubmit , formState: { errors },getValues ,watch,reset} = useForm();
 
@@ -521,20 +518,23 @@ function IndexApp(){
           mymodal = useRef(null);
          
     //API取data
-    useEffect(()=>{
-     axios.get(`${URL}/v2/api/${PATH}/admin/products/all`)
-        .then((res)=>{
-          if(res.data.products){
-            const productsArray = Object.values(res.data.products);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const res = await axios.get(`${URL}/v2/api/${PATH}/admin/products/all`);
+          const products = res.data?.products;
+          if (products) {
+            const productsArray = Object.values(products);
             setProducts(productsArray);
           }
+        } catch (err) {
+          console.log(err);
         }
-        )
-        .catch((err)=>{
-            console.log(err)
-        })
-        }
-    ,[tempProduct])
+      };
+    
+      fetchData();
+    }, [tempProduct]);
+    
     
     //驗證登入
      const check = useCallback(()=>{
